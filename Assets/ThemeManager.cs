@@ -18,6 +18,8 @@ public class ThemeManager : MonoBehaviour
     public Animator _catIconAnim;
     public ParticleSystem _rainPS;
     public GameObject _cloud;
+    public GameObject _cloudB;
+    public GameObject _sunRays;
 
     private enum WeatherTheme
     {
@@ -54,6 +56,8 @@ public class ThemeManager : MonoBehaviour
             _background.color = _bacgroundDefaultColor;
             _rainPS.gameObject.SetActive(false);
             _cloud.SetActive(false);
+            _cloudB.SetActive(false);
+            _sunRays.SetActive(false);
             _infoText.text = "No information on current weather.";
         }
         else if (current_theme == WeatherTheme.other)
@@ -63,7 +67,9 @@ public class ThemeManager : MonoBehaviour
             _background.color = _backgroundColors[0];
             _rainPS.gameObject.SetActive(false);
             _cloud.SetActive(true);
-            _infoText.text = "Current weather is not rainy";
+            _cloudB.SetActive(false);
+            _sunRays.SetActive(true);
+            _infoText.text = "Current weather is not rainy.";
         }
         else if (current_theme == WeatherTheme.rain)
         {
@@ -72,7 +78,9 @@ public class ThemeManager : MonoBehaviour
             _background.color = _backgroundColors[1];
             _rainPS.gameObject.SetActive(true);
             _cloud.SetActive(false);
-            _infoText.text = "Current weather is rainy";
+            _cloudB.SetActive(true);
+            _sunRays.SetActive(false);
+            _infoText.text = "Current weather is rainy...";
         }
     }
 }
