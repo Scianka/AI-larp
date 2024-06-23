@@ -4,16 +4,20 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.Networking;
+using System.Diagnostics.Tracing;
 
 public class ThemeManager : MonoBehaviour
 {
-    public TMP_Text infoText;
-    public RawImage background;
-    public Color32[] backgroundColors;
-    private Color32 bacgroundDefaultColor;
-    public Image catIcon;
-    public Sprite[] catIconSources;
-    private Sprite catIiconDefaultSource;
+    public TMP_Text _infoText;
+    public RawImage _background;
+    public Color32[] _backgroundColors;
+    private Color32 _bacgroundDefaultColor;
+    public Image _catIcon;
+    public Sprite[] _catIconSources;
+    private Sprite _catIiconDefaultSource;
+    public Animator _catIconAnim;
+    public ParticleSystem _rainPS;
+    public GameObject _cloud;
 
     private enum WeatherTheme
     {
@@ -26,9 +30,8 @@ public class ThemeManager : MonoBehaviour
 
     private void Start()
     {
-        catIiconDefaultSource = catIcon.sprite;
-        bacgroundDefaultColor = background.color;
-        catIcon.sprite = catIconSources[0];
+        _catIiconDefaultSource = _catIcon.sprite;
+        _bacgroundDefaultColor = _background.color;
         current_theme = WeatherTheme.none;
 
         //curl https://platform.openai.com;
@@ -37,27 +40,39 @@ public class ThemeManager : MonoBehaviour
     private void Update()
     {
         bool rainy_theme_on = true;
-        if (current_theme != WeatherTheme.rain) { rainy_theme_on = false; }
-
-        if (Input.GetKeyDown(KeyCode.Return)) { current_theme = rainy_theme_on ? WeatherTheme.other : WeatherTheme.rain; }
+        if (current_theme != WeatherTheme.rain) rainy_theme_on = false;
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            current_theme = rainy_theme_on ? WeatherTheme.other : WeatherTheme.rain;
+            _catIcon.rectTransform.rotation = new Quaternion(0, 0, 0, 0);
+        }
 
         if (current_theme == WeatherTheme.none)
         {
-            catIcon.sprite = catIiconDefaultSource;
-            background.color = bacgroundDefaultColor;
-            infoText.text = "No information on current weather.";
+            _catIcon.sprite = _catIiconDefaultSource;
+            _catIconAnim.Play("CatGuitar");
+            _background.color = _bacgroundDefaultColor;
+            _rainPS.gameObject.SetActive(false);
+            _cloud.SetActive(false);
+            _infoText.text = "No information on current weather.";
         }
         else if (current_theme == WeatherTheme.other)
         {
-            catIcon.sprite = catIconSources[0];
-            background.color = backgroundColors[0];
-            infoText.text = "Current weather: Not rainy";
+            _catIcon.sprite = _catIconSources[0];
+            _catIconAnim.Play("CatCool");
+            _background.color = _backgroundColors[0];
+            _rainPS.gameObject.SetActive(false);
+            _cloud.SetActive(true);
+            _infoText.text = "Current weather is not rainy";
         }
         else if (current_theme == WeatherTheme.rain)
         {
-            catIcon.sprite = catIconSources[1];
-            background.color = backgroundColors[1];
-            infoText.text = "Current weather: Rainy";
+            _catIcon.sprite = _catIconSources[1];
+            _catIconAnim.Play("CatCry");
+            _background.color = _backgroundColors[1];
+            _rainPS.gameObject.SetActive(true);
+            _cloud.SetActive(false);
+            _infoText.text = "Current weather is rainy";
         }
     }
 }
