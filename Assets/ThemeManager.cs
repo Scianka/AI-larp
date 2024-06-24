@@ -20,6 +20,7 @@ public class ThemeManager : MonoBehaviour
     public GameObject _cloud;
     public GameObject _cloudB;
     public GameObject _sunRays;
+    public AudioSource _rainAudio;
     public Animator _transitionBlockAnim;
     private bool _transitionCanOccur = true;
     private Coroutine _eatherCoroutine;
@@ -38,6 +39,7 @@ public class ThemeManager : MonoBehaviour
         _catIiconDefaultSource = _catIcon.sprite;
         _bacgroundDefaultColor = _background.color;
         current_theme = WeatherTheme.none;
+        _rainAudio.Stop();
 
         //curl https://platform.openai.com;
     }
@@ -70,6 +72,7 @@ public class ThemeManager : MonoBehaviour
         _cloud.SetActive(false);
         _cloudB.SetActive(false);
         _sunRays.SetActive(false);
+        _rainAudio.Stop();
         _infoText.text = "No information on current weather.";
     }
 
@@ -84,6 +87,7 @@ public class ThemeManager : MonoBehaviour
         _cloud.SetActive(true);
         _cloudB.SetActive(false);
         _sunRays.SetActive(true);
+        _rainAudio.Stop();
         _infoText.text = "Current weather is not rainy.";
     }
 
@@ -98,6 +102,7 @@ public class ThemeManager : MonoBehaviour
         _cloud.SetActive(false);
         _cloudB.SetActive(true);
         _sunRays.SetActive(false);
+        _rainAudio.Play();
         _infoText.text = "Current weather is rainy...";
     }
 
