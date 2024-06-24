@@ -1495,8 +1495,8 @@ MonoBehaviour:
   maxFlickerIntervalB: 2
   minFlickerIntervalLitB: 5
   maxFlickerIntervalLitB: 10
-  minTransitionDurationB: 2
-  maxTransitionDurationB: 5
+  minTransitionDurationB: 1
+  maxTransitionDurationB: 3
 --- !u!1 &1578691597
 GameObject:
   m_ObjectHideFlags: 0
