@@ -56,6 +56,7 @@ public class ThemeManager : MonoBehaviour
             if (current_theme == WeatherTheme.none) StartCoroutine(NoneWeather());
             else if (current_theme == WeatherTheme.other) StartCoroutine(OtherWeather());
             else if (current_theme == WeatherTheme.rain) StartCoroutine(RainWeather());
+            JokingTime();
             //DebugLogs();
         }
         //DebugLogs();
@@ -112,6 +113,9 @@ public class ThemeManager : MonoBehaviour
         yield return new WaitForSeconds(2.67f);
         _transitionCanOccur = true;
     }
+
+    // function made for first API testing and learning
+    private void JokingTime() => Debug.Log(ChuckNorrisJokeAPI.GetNewJoke().value);
 
     private void DebugLogs()
     {
