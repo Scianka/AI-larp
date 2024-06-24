@@ -1,10 +1,7 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using UnityEngine.Networking;
-using System.Diagnostics.Tracing;
 
 public class ThemeManager : MonoBehaviour
 {
@@ -40,7 +37,9 @@ public class ThemeManager : MonoBehaviour
         _bacgroundDefaultColor = _background.color;
         current_theme = WeatherTheme.none;
         _rainAudio.Stop();
-        CallWeatherAPI();
+
+        // calling APIs:
+        CallOpenAI_API();
         //JokingTime();
     }
 
@@ -111,10 +110,10 @@ public class ThemeManager : MonoBehaviour
         _transitionCanOccur = true;
     }
 
+    private void CallOpenAI_API() => HaTeTPLowQualityAPI.InitializeNewAPICall();
+
     // function made for first API testing and learning
     private void JokingTime() => Debug.Log(ChuckNorrisJokeAPI.GetNewJoke().value);
-
-    private void CallWeatherAPI() => HaTeTPLowQualityAPI.InitializeNewAPICall();
 
     private void DebugLogs()
     {

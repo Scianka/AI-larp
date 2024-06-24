@@ -1,7 +1,9 @@
 [System.Serializable]
 public class ChuckNorrisJoke
 {
-    // here goes a HTTP response's parsed content from the Chuck Norris Jokes API
+    // here goes API response's parsed data,
+    // so it can be accessed with parameters,
+    // when the function handling API is called
     public string[] categories;
     public string created_at;
     public string icon_url;
