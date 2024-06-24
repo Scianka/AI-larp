@@ -20,6 +20,9 @@ public class ThemeManager : MonoBehaviour
     public GameObject _cloud;
     public GameObject _cloudB;
     public GameObject _sunRays;
+    public Animator _transitionBlockAnim;
+    private bool _transitionCanOccur = true;
+    private Coroutine _eatherCoroutine;
 
     private enum WeatherTheme
     {
@@ -43,44 +46,70 @@ public class ThemeManager : MonoBehaviour
     {
         bool rainy_theme_on = true;
         if (current_theme != WeatherTheme.rain) rainy_theme_on = false;
-        if (Input.GetKeyDown(KeyCode.Return))
+        if (Input.GetKeyDown(KeyCode.Return) && _transitionCanOccur)
         {
+            StartCoroutine(TransitionEnabler());
+            _transitionBlockAnim.Play("BlockTrans", -1, 0f);
             current_theme = rainy_theme_on ? WeatherTheme.other : WeatherTheme.rain;
-            _catIcon.rectTransform.rotation = new Quaternion(0, 0, 0, 0);
+            if (current_theme == WeatherTheme.none) StartCoroutine(NoneWeather());
+            else if (current_theme == WeatherTheme.other) StartCoroutine(OtherWeather());
+            else if (current_theme == WeatherTheme.rain) StartCoroutine(RainWeather());
+            //DebugLogs();
         }
+        //DebugLogs();
+    }
 
-        if (current_theme == WeatherTheme.none)
-        {
-            _catIcon.sprite = _catIiconDefaultSource;
-            _catIconAnim.Play("CatGuitar");
-            _background.color = _bacgroundDefaultColor;
-            _rainPS.gameObject.SetActive(false);
-            _cloud.SetActive(false);
-            _cloudB.SetActive(false);
-            _sunRays.SetActive(false);
-            _infoText.text = "No information on current weather.";
-        }
-        else if (current_theme == WeatherTheme.other)
-        {
-            _catIcon.sprite = _catIconSources[0];
-            _catIconAnim.Play("CatCool");
-            _background.color = _backgroundColors[0];
-            _rainPS.gameObject.SetActive(false);
-            _cloud.SetActive(true);
-            _cloudB.SetActive(false);
-            _sunRays.SetActive(true);
-            _infoText.text = "Current weather is not rainy.";
-        }
-        else if (current_theme == WeatherTheme.rain)
-        {
-            _catIcon.sprite = _catIconSources[1];
-            _catIconAnim.Play("CatCry");
-            _background.color = _backgroundColors[1];
-            _rainPS.gameObject.SetActive(true);
-            _cloud.SetActive(false);
-            _cloudB.SetActive(true);
-            _sunRays.SetActive(false);
-            _infoText.text = "Current weather is rainy...";
-        }
+    private IEnumerator NoneWeather()
+    {
+        yield return new WaitForSeconds(1.17f);
+        _catIcon.rectTransform.rotation = new Quaternion(0, 0, 0, 0);
+        _catIcon.sprite = _catIiconDefaultSource;
+        _catIconAnim.Play("CatGuitar");
+        _background.color = _bacgroundDefaultColor;
+        _rainPS.gameObject.SetActive(false);
+        _cloud.SetActive(false);
+        _cloudB.SetActive(false);
+        _sunRays.SetActive(false);
+        _infoText.text = "No information on current weather.";
+    }
+
+    private IEnumerator OtherWeather()
+    {
+        yield return new WaitForSeconds(1.17f);
+        _catIcon.rectTransform.rotation = new Quaternion(0, 0, 0, 0);
+        _catIcon.sprite = _catIconSources[0];
+        _catIconAnim.Play("CatCool");
+        _background.color = _backgroundColors[0];
+        _rainPS.gameObject.SetActive(false);
+        _cloud.SetActive(true);
+        _cloudB.SetActive(false);
+        _sunRays.SetActive(true);
+        _infoText.text = "Current weather is not rainy.";
+    }
+
+    private IEnumerator RainWeather()
+    {
+        yield return new WaitForSeconds(1.17f);
+        _catIcon.rectTransform.rotation = new Quaternion(0, 0, 0, 0);
+        _catIcon.sprite = _catIconSources[1];
+        _catIconAnim.Play("CatCry");
+        _background.color = _backgroundColors[1];
+        _rainPS.gameObject.SetActive(true);
+        _cloud.SetActive(false);
+        _cloudB.SetActive(true);
+        _sunRays.SetActive(false);
+        _infoText.text = "Current weather is rainy...";
+    }
+
+    private IEnumerator TransitionEnabler()
+    {
+        _transitionCanOccur = false;
+        yield return new WaitForSeconds(2.67f);
+        _transitionCanOccur = true;
+    }
+
+    private void DebugLogs()
+    {
+        Debug.Log(current_theme);
     }
 }
