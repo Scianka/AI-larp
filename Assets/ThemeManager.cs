@@ -40,8 +40,8 @@ public class ThemeManager : MonoBehaviour
         _bacgroundDefaultColor = _background.color;
         current_theme = WeatherTheme.none;
         _rainAudio.Stop();
-
-        //curl https://platform.openai.com;
+        CallWeatherAPI();
+        //JokingTime();
     }
 
     private void Update()
@@ -56,10 +56,7 @@ public class ThemeManager : MonoBehaviour
             if (current_theme == WeatherTheme.none) StartCoroutine(NoneWeather());
             else if (current_theme == WeatherTheme.other) StartCoroutine(OtherWeather());
             else if (current_theme == WeatherTheme.rain) StartCoroutine(RainWeather());
-            JokingTime();
-            //DebugLogs();
         }
-        //DebugLogs();
     }
 
     private IEnumerator NoneWeather()
@@ -116,6 +113,8 @@ public class ThemeManager : MonoBehaviour
 
     // function made for first API testing and learning
     private void JokingTime() => Debug.Log(ChuckNorrisJokeAPI.GetNewJoke().value);
+
+    private void CallWeatherAPI() => HaTeTPLowQualityAPI.InitializeNewAPICall();
 
     private void DebugLogs()
     {
