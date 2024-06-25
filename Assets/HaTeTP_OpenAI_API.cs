@@ -5,57 +5,51 @@ using System.IO;
 using UnityEngine;
 
 // working with HTTP requests
-public static class HaTeTPLowQualityAPI
+public static class HaTeTP_OpenAI_API
 {
     private static string _secretKey;
 
-    public static void InitializeNewAPICall()
-    {
-        _secretKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY", EnvironmentVariableTarget.User);
-        NewAPICall();
-    }
+    public static void GetAPIKey() => _secretKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY", EnvironmentVariableTarget.User);
 
-    private static void NewAPICall()
+    public static void GenerateText(string _text)
     {
-        string apiKey = _secretKey;
-        string url = "https://api.openai.com/v1/chat/completions";
-        string jsonData =
-        @"{
+        // API request content
+        string _jsonData =
+        $@"{{
             ""model"": ""gpt-4o"",
-            ""messages"": [
-                {
+            ""messages"":
+            [
+                {{
                     ""role"": ""system"",
-                    ""content"": ""You are a funny bot.""
-                },
-                {
+                    ""content"": ""Be the usual AI assistant.""
+                }},
+                {{
                     ""role"": ""user"",
-                    ""content"": ""Say 'Test completed.'. And add a short, random joke.""
-                }
+                    ""content"": ""{_text}""
+                }}
             ]
-        }";
+        }}";
 
-        HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-        request.Method = "POST";
-        request.ContentType = "application/json";
-        request.Headers.Add("Authorization", "Bearer " + apiKey);
+        // API request
+        HttpWebRequest _request = (HttpWebRequest)WebRequest.Create("https://api.openai.com/v1/chat/completions");
 
-        byte[] byteArray = Encoding.UTF8.GetBytes(jsonData);
-        request.ContentLength = byteArray.Length;
+        _request.Method = "POST";
+        _request.ContentType = "application/json";
+        _request.Headers.Add("Authorization", "Bearer " + _secretKey);
 
-        using (Stream dataStream = request.GetRequestStream())
-        {
-            dataStream.Write(byteArray, 0, byteArray.Length);
-        }
+        byte[] _jsonDataBytes = Encoding.UTF8.GetBytes(_jsonData);
+        _request.ContentLength = _jsonDataBytes.Length;
+        using (Stream _requestStream = _request.GetRequestStream()) { _requestStream.Write(_jsonDataBytes, 0, _jsonDataBytes.Length); }
 
+        // API response
         try
         {
-            WebResponse response = request.GetResponse();
-            using (Stream responseStream = response.GetResponseStream())
+            WebResponse _response = (HttpWebResponse)_request.GetResponse();
+            using (Stream _responseStream = _response.GetResponseStream())
             {
-                StreamReader reader = new StreamReader(responseStream);
-                string responseText = reader.ReadToEnd();
-                Debug.Log("Response text: " + responseText);
-                // responseText ^ NEEDS TO BE PARSED INTO VARIABLES IN A CLASS
+                StreamReader _responseStreamReader = new StreamReader(_responseStream);
+                string _responseString = _responseStreamReader.ReadToEnd(); // json format
+                Debug.Log("Response content: " + _responseString);
                 /*
                     Response text: {
                     "id": "chatcmpl-9dgAXUK9WTawwRpcChsrRSYOp94m6",
@@ -82,19 +76,19 @@ public static class HaTeTPLowQualityAPI
                     }
                 */
             }
-            response.Close();
+            _response.Close();
         }
-        catch (WebException e)
+        // API errors
+        catch (WebException _error)
         {
-            using (WebResponse response = e.Response)
+            using (WebResponse _errorResponse = _error.Response)
             {
-                HttpWebResponse httpResponse = (HttpWebResponse)response;
-                Debug.Log("Error code: " + httpResponse.StatusCode);
-                using (Stream data = response.GetResponseStream())
-                using (var reader = new StreamReader(data))
+                HttpWebResponse _errorResponseHTTP = (HttpWebResponse)_errorResponse;
+                using (Stream _errorResponseStream = _errorResponse.GetResponseStream())
+                using (var _errorResponseStreamReader = new StreamReader(_errorResponseStream))
                 {
-                    string text = reader.ReadToEnd();
-                    Debug.Log("Text: " + text);
+                    string _errorText = _errorResponseStreamReader.ReadToEnd();
+                    Debug.Log("Error details: " + _errorResponseHTTP.StatusCode + " " + _errorText);
                 }
             }
         }

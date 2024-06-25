@@ -38,9 +38,12 @@ public class ThemeManager : MonoBehaviour
         current_theme = WeatherTheme.none;
         _rainAudio.Stop();
 
+        // accessing API
+        HaTeTP_OpenAI_API.GetAPIKey();
+
         // calling APIs:
-        CallOpenAI_API();
-        //JokingTime();
+        HaTeTP_OpenAI_API.GenerateText("Hello world!");
+        //Debug.Log(ChuckNorrisJokeAPI.GetNewJoke().value);
     }
 
     private void Update()
@@ -49,16 +52,16 @@ public class ThemeManager : MonoBehaviour
         if (current_theme != WeatherTheme.rain) rainy_theme_on = false;
         if (Input.GetKeyDown(KeyCode.Return) && _transitionCanOccur)
         {
-            StartCoroutine(TransitionEnabler());
+            StartCoroutine(ThemeTransitionEnabler());
             _transitionBlockAnim.Play("BlockTrans", -1, 0f);
             current_theme = rainy_theme_on ? WeatherTheme.other : WeatherTheme.rain;
-            if (current_theme == WeatherTheme.none) StartCoroutine(NoneWeather());
-            else if (current_theme == WeatherTheme.other) StartCoroutine(OtherWeather());
-            else if (current_theme == WeatherTheme.rain) StartCoroutine(RainWeather());
+            if (current_theme == WeatherTheme.none) StartCoroutine(NoneTheme());
+            else if (current_theme == WeatherTheme.other) StartCoroutine(OtherTheme());
+            else if (current_theme == WeatherTheme.rain) StartCoroutine(RainTheme());
         }
     }
 
-    private IEnumerator NoneWeather()
+    private IEnumerator NoneTheme()
     {
         yield return new WaitForSeconds(1.17f);
         _catIcon.rectTransform.rotation = new Quaternion(0, 0, 0, 0);
@@ -73,7 +76,7 @@ public class ThemeManager : MonoBehaviour
         _infoText.text = "No information on current weather.";
     }
 
-    private IEnumerator OtherWeather()
+    private IEnumerator OtherTheme()
     {
         yield return new WaitForSeconds(1.17f);
         _catIcon.rectTransform.rotation = new Quaternion(0, 0, 0, 0);
@@ -88,7 +91,7 @@ public class ThemeManager : MonoBehaviour
         _infoText.text = "Current weather is not rainy.";
     }
 
-    private IEnumerator RainWeather()
+    private IEnumerator RainTheme()
     {
         yield return new WaitForSeconds(1.17f);
         _catIcon.rectTransform.rotation = new Quaternion(0, 0, 0, 0);
@@ -103,20 +106,10 @@ public class ThemeManager : MonoBehaviour
         _infoText.text = "Current weather is rainy...";
     }
 
-    private IEnumerator TransitionEnabler()
+    private IEnumerator ThemeTransitionEnabler()
     {
         _transitionCanOccur = false;
         yield return new WaitForSeconds(2.67f);
         _transitionCanOccur = true;
-    }
-
-    private void CallOpenAI_API() => HaTeTPLowQualityAPI.InitializeNewAPICall();
-
-    // function made for first API testing and learning
-    private void JokingTime() => Debug.Log(ChuckNorrisJokeAPI.GetNewJoke().value);
-
-    private void DebugLogs()
-    {
-        Debug.Log(current_theme);
     }
 }

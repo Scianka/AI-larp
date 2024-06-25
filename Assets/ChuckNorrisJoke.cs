@@ -1,7 +1,7 @@
 [System.Serializable]
 public class ChuckNorrisJoke
 {
-    // here goes API response's parsed data,
+    // here goes an API call's parsed data,
     // so it can be accessed with parameters,
     // when the function handling API is called
     public string[] categories;
