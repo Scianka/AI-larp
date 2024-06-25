@@ -42,7 +42,7 @@ public class ThemeManager : MonoBehaviour
         HaTeTP_OpenAI_API.GetAPIKey();
 
         // calling APIs:
-        HaTeTP_OpenAI_API.GenerateText("Hello world!");
+        Debug.Log(HaTeTP_OpenAI_API.GenerateText("Hello world!").choices[0].message.content);
         //Debug.Log(ChuckNorrisJokeAPI.GetNewJoke().value);
     }
 

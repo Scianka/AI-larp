@@ -11,7 +11,7 @@ public static class HaTeTP_OpenAI_API
 
     public static void GetAPIKey() => _secretKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY", EnvironmentVariableTarget.User);
 
-    public static void GenerateText(string _text)
+    public static TextGenerationData GenerateText(string? _text)
     {
         // API request content
         string _jsonData =
@@ -47,8 +47,8 @@ public static class HaTeTP_OpenAI_API
             HttpWebResponse _response = (HttpWebResponse)_request.GetResponse();
             StreamReader _responseReader = new StreamReader(_response.GetResponseStream());
             string _responseString = _responseReader.ReadToEnd(); // json data format
-            Debug.Log("Response content: " + _responseString);
-            _response.Close();
+            _response.Close(); // not a best place?
+            return JsonUtility.FromJson<TextGenerationData>(_responseString);
         }
         // API errors
         catch (WebException _error)
@@ -57,6 +57,7 @@ public static class HaTeTP_OpenAI_API
             StreamReader _errorResponseReader = new StreamReader(_errorResponse.GetResponseStream());
             string _errorText = _errorResponseReader.ReadToEnd();
             Debug.Log("Error details: " + _errorResponse.StatusCode + " " + _errorText);
+            return JsonUtility.FromJson<TextGenerationData>(null); // this needs a better solution
         }
     }
 }

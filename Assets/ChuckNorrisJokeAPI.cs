@@ -4,7 +4,7 @@ using UnityEngine;
 
 public static class ChuckNorrisJokeAPI
 {
-    // when this function is called (by another script) it handles an API call and then parses received data into more accessible format (class instance)
+    // when this function is called (by another script) it handles an API call and then parses received data into more accessible format
     public static ChuckNorrisJoke GetNewJoke()
     {
         // handling API call

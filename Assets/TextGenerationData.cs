@@ -1,27 +1,37 @@
-[System.Serializable]
+using System;
+
+[Serializable]
 public class TextGenerationData
 {
-    /*{
-        "id": "chatcmpl-9e2DHCXWskuzZiSYFAdYT7QAT61TD",
-        "object": "chat.completion",
-        "created": 1719328655,
-        "model": "gpt-4o-2024-05-13",
-        "choices": [
-        {
-            "index": 0,
-            "message": {
-            "role": "assistant",
-            "content": "Hello! How can I assist you today?"
-            },
-            "logprobs": null,
-            "finish_reason": "stop"
-        }
-        ],
-        "usage": {
-        "prompt_tokens": 20,
-        "completion_tokens": 9,
-        "total_tokens": 29
-        },
-        "system_fingerprint": "fp_3e7d703517"
-    }*/
+    public string id;
+    public string @object;
+    public long created;
+    public string model;
+    public Choices[] choices;
+    public Usage usage;
+    public string system_fingerprint;
 }
+
+    [Serializable]
+    public class Choices
+    {
+        public int index;
+        public Message message;
+        public object logprobs;
+        public string finish_reason;
+    }
+
+        [Serializable]
+        public class Message
+        {
+            public string role;
+            public string content;
+        }
+
+    [Serializable]
+    public class Usage
+    {
+        public int prompt_tokens;
+        public int completion_tokens;
+        public int total_tokens;
+    }
