@@ -39,58 +39,24 @@ public static class HaTeTP_OpenAI_API
 
         byte[] _jsonDataBytes = Encoding.UTF8.GetBytes(_jsonData);
         _request.ContentLength = _jsonDataBytes.Length;
-        using (Stream _requestStream = _request.GetRequestStream()) { _requestStream.Write(_jsonDataBytes, 0, _jsonDataBytes.Length); }
+        _request.GetRequestStream().Write(_jsonDataBytes, 0, _jsonDataBytes.Length);
 
         // API response
         try
         {
-            WebResponse _response = (HttpWebResponse)_request.GetResponse();
-            using (Stream _responseStream = _response.GetResponseStream())
-            {
-                StreamReader _responseStreamReader = new StreamReader(_responseStream);
-                string _responseString = _responseStreamReader.ReadToEnd(); // json format
-                Debug.Log("Response content: " + _responseString);
-                /*
-                    Response content: {
-                      "id": "chatcmpl-9e2DHCXWskuzZiSYFAdYT7QAT61TD",
-                      "object": "chat.completion",
-                      "created": 1719328655,
-                      "model": "gpt-4o-2024-05-13",
-                      "choices": [
-                        {
-                          "index": 0,
-                          "message": {
-                            "role": "assistant",
-                            "content": "Hello! How can I assist you today?"
-                          },
-                          "logprobs": null,
-                          "finish_reason": "stop"
-                        }
-                      ],
-                      "usage": {
-                        "prompt_tokens": 20,
-                        "completion_tokens": 9,
-                        "total_tokens": 29
-                      },
-                      "system_fingerprint": "fp_3e7d703517"
-                    }
-                */
-            }
+            HttpWebResponse _response = (HttpWebResponse)_request.GetResponse();
+            StreamReader _responseReader = new StreamReader(_response.GetResponseStream());
+            string _responseString = _responseReader.ReadToEnd(); // json data format
+            Debug.Log("Response content: " + _responseString);
             _response.Close();
         }
         // API errors
         catch (WebException _error)
         {
-            using (WebResponse _errorResponse = _error.Response)
-            {
-                HttpWebResponse _errorResponseHTTP = (HttpWebResponse)_errorResponse;
-                using (Stream _errorResponseStream = _errorResponse.GetResponseStream())
-                using (var _errorResponseStreamReader = new StreamReader(_errorResponseStream))
-                {
-                    string _errorText = _errorResponseStreamReader.ReadToEnd();
-                    Debug.Log("Error details: " + _errorResponseHTTP.StatusCode + " " + _errorText);
-                }
-            }
+            HttpWebResponse _errorResponse = (HttpWebResponse)_error.Response;
+            StreamReader _errorResponseReader = new StreamReader(_errorResponse.GetResponseStream());
+            string _errorText = _errorResponseReader.ReadToEnd();
+            Debug.Log("Error details: " + _errorResponse.StatusCode + " " + _errorText);
         }
     }
 }
