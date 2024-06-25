@@ -51,28 +51,28 @@ public static class HaTeTP_OpenAI_API
                 string _responseString = _responseStreamReader.ReadToEnd(); // json format
                 Debug.Log("Response content: " + _responseString);
                 /*
-                    Response text: {
-                    "id": "chatcmpl-9dgAXUK9WTawwRpcChsrRSYOp94m6",
-                    "object": "chat.completion",
-                    "created": 1719243917,
-                    "model": "gpt-3.5-turbo-0125",
-                    "choices": [
-                    {
-                    "index": 0,
-                    "message": {
-                    "role": "assistant",
-                    "content": "In the realm of code, a concept profound,\nRecursion reigns, whimsically bound.\nA function calling itself, without a frown,\nA dance of elegance, up and down.\n\nLike a mirror reflecting its own reflection,\nRecursion dives into a deep connection.\nBreaking problems into smaller parts,\nIt unwraps mysteries, revealing hearts.\n\nEach recursive call a journey anew,\nSolving puzzles with a mystical view.\nStack frames stacking, like a tower tall,\nUntil the base case answers the call.\n\nA cycle of repetition, in patterns delight,\nRecursive dreams take flight.\nInfinite loops or beauty divine,\nRecursion dances in a sublime design.\n\nSo embrace the recursion, with courage and zest,\nIn the world of programming, it truly is the best.\nA poetic loop, a magical song,\nIn the vast universe of code, where we all belong."
-                    },
-                    "logprobs": null,
-                    "finish_reason": "stop"
-                    }
-                    ],
-                    "usage": {
-                    "prompt_tokens": 39,
-                    "completion_tokens": 172,
-                    "total_tokens": 211
-                    },
-                    "system_fingerprint": null
+                    Response content: {
+                      "id": "chatcmpl-9e2DHCXWskuzZiSYFAdYT7QAT61TD",
+                      "object": "chat.completion",
+                      "created": 1719328655,
+                      "model": "gpt-4o-2024-05-13",
+                      "choices": [
+                        {
+                          "index": 0,
+                          "message": {
+                            "role": "assistant",
+                            "content": "Hello! How can I assist you today?"
+                          },
+                          "logprobs": null,
+                          "finish_reason": "stop"
+                        }
+                      ],
+                      "usage": {
+                        "prompt_tokens": 20,
+                        "completion_tokens": 9,
+                        "total_tokens": 29
+                      },
+                      "system_fingerprint": "fp_3e7d703517"
                     }
                 */
             }
