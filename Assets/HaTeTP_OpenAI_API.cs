@@ -7,17 +7,21 @@ using UnityEngine;
 // working with HTTP requests
 public static class HaTeTP_OpenAI_API
 {
+    public static bool _isAPICallProcessing = false;
+    public static bool _didErrorOccur = false; // is set to true when a response is defective or http error happened
     private static string _secretKey;
 
     public static void GetAPIKey() => _secretKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY", EnvironmentVariableTarget.User);
 
-    public static TextGenerationData GenerateText(string? _text)
+    public static TextGenerationData GenerateText(string _text)
     {
-        // 0 - _locationName, 1 - _isLocationValid, 2 - _isLocationReal, 3 - _canAIAccessWeatherInfo, 4 - _currentTheme
+        _isAPICallProcessing = true;
+        _didErrorOccur = false;
+
         string _AISystemSettings = "You are a function in a weather app. You don't interact with the user directly." +
             "Based on given input, you always respond with only 5 key-words and separate them with sign '*'. Never include this sign in your key-words." +
-            "The user will always send you a location's name. It can be fictional or real." +
-            "If you have any information on it, set first key-word to the interpreted name (keep it short) and the second key-word to 'valid'. " +
+            "The user will always send you a location's data - usually in a form of name. The location can be fictional or real." +
+            "If you have any information on it, set first key-word to the deduced name (keep it short) and the second key-word to 'valid'. " +
             "If you can't find anything, set all the key-words to 'invalid' and don't execute next steps." +
             "Next, determine whether the location is real or fictional. If it is real, set third key-word to 'real'. If it is fictional, set third key-word to 'fictional'. " +
             "Then, if the location is real and you can check its current weather - check the weather and decide whether it is rather rainy or any other kind of weather. " +
@@ -56,22 +60,35 @@ public static class HaTeTP_OpenAI_API
         _request.GetRequestStream().Write(_jsonDataBytes, 0, _jsonDataBytes.Length);
 
         // API response
+        HttpWebResponse _response = null;
+        StreamReader _responseReader = null;
         try
         {
-            HttpWebResponse _response = (HttpWebResponse)_request.GetResponse();
-            StreamReader _responseReader = new StreamReader(_response.GetResponseStream());
-            string _responseString = _responseReader.ReadToEnd(); // json data format
-            _response.Close(); // not a best place?
-            return JsonUtility.FromJson<TextGenerationData>(_responseString);
+            _response = (HttpWebResponse)_request.GetResponse();
+            _responseReader = new StreamReader(_response.GetResponseStream());
+            string _responseString = _responseReader.ReadToEnd();
+            TextGenerationData _generatedText = JsonUtility.FromJson<TextGenerationData>(_responseString);
+            if (_generatedText.choices[0].finish_reason != "stop")
+            {
+                _didErrorOccur = true;
+                Debug.Log("API error details : " + _generatedText.choices[0].finish_reason);
+            }
+            return _generatedText;
         }
         // API errors
         catch (WebException _error)
         {
+            // BEWARE A BUGGY SECTION
+            _didErrorOccur = true;
             HttpWebResponse _errorResponse = (HttpWebResponse)_error.Response;
-            StreamReader _errorResponseReader = new StreamReader(_errorResponse.GetResponseStream());
-            string _errorText = _errorResponseReader.ReadToEnd();
-            Debug.Log("Error details: " + _errorResponse.StatusCode + " " + _errorText);
-            return JsonUtility.FromJson<TextGenerationData>(null); // this needs a better solution
+            Debug.Log("Web error details : " + _errorResponse.StatusCode);
+            return JsonUtility.FromJson<TextGenerationData>(null);
+        }
+        finally
+        {
+            if (_responseReader != null) _responseReader.Close();
+            if (_response != null) _response.Close();
+            _isAPICallProcessing = false;
         }
     }
 }

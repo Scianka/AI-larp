@@ -21,13 +21,11 @@ public class ThemeManager : MonoBehaviour
     public Animator _transitionBlockAnim;
     private bool _themeTransitionCanOccur = true;
     public TMP_InputField _playerText;
-
-    private string _locationName = "(...)";
-    private bool _isAPICallProcessing = false;
+    private string _locationName;
     private bool _isLocationValid;
     private bool _isLocationReal;
-    private bool _canAIAccessWeatherInfo;
-    // private WeatherTheme _currentTheme
+    private bool _canAIAccessCurrentWeather;
+    private TextGenerationData _generatedText;
 
     private enum WeatherTheme
     {
@@ -36,7 +34,7 @@ public class ThemeManager : MonoBehaviour
         rain,
     }
 
-    private WeatherTheme _currentTheme;
+    private WeatherTheme? _currentTheme;
 
     private void Start()
     {
@@ -44,84 +42,50 @@ public class ThemeManager : MonoBehaviour
         _bacgroundDefaultColor = _background.color;
         _currentTheme = WeatherTheme.none;
         _rainAudio.Stop();
-        Debug.Log("Hi! In this weather app you can check current weather in both real and fictional places. Although, it will only tell you whether the weather is rainy or not.");
-
-        // accessing API
         HaTeTP_OpenAI_API.GetAPIKey();
-
-        // calling APIs:
-        //Debug.Log(HaTeTP_OpenAI_API.GenerateText("Say in your own words that Chuck Norris jokes aren't funny.").choices[0].message.content);
-        //Debug.Log(ChuckNorrisJokeAPI.GetNewJoke().value);
     }
 
     private void Update()
     {
-        // DON'T LET THE FUNCTION MAKE API CALLS WHEN THERE IS ONE ALREADY UNDERGOING PROCESSING
-        if (Input.GetKeyDown(KeyCode.Return) && _themeTransitionCanOccur && !_isAPICallProcessing)
+        if (Input.GetKeyDown(KeyCode.Return) && _themeTransitionCanOccur && !HaTeTP_OpenAI_API._isAPICallProcessing)
         {
             string _enteredLocation = _playerText.text;
-            Debug.Log("Current weather is " + HaTeTP_OpenAI_API.GenerateText(_enteredLocation).GetCurrentThemeAsString() + "!");
+            _generatedText = HaTeTP_OpenAI_API.GenerateText(_enteredLocation);
+            StartCoroutine(WaitForAPICallToEnd());
+        }
+    }
 
-            // LET AI EXTRACT RELATED VARIABLES' VALUES FROM IT
-
-            // AND IF THERE IS AN API CALL ERROR - DISPLAY AN APPROPRIATE DEBUG LOG AND STOP EXECUTING THE REST OF THIS CODE (CHECK FOR ERRORS BEFORE MANAGING VARIABLES)
-
-            // IF THE LOCATION IS VALID BUT IT IS NOT REAL - LET AI DECIDE BETWEEN rain OR other WeatherTheme (BASED ON THE OVERALL LOCATION'S CHARACTERISTICS)
-            // IF THE LOCATION IS VALID AND REAL AND AI HAS INFO ON IT'S WEATHER - CHECK THE ACTUAL WEATHER AND BASED THAT LET AI DECIDE BETWEEN rain OR other WeatherTheme
-            // IF THE LOCATION IS VAILD AND REAL BUT AI HAS NO INFO ON IT'S WEATHER -  RESULT IS none WeatherTheme
-            // IF THE LOCATION IS NOT VALID - RESULT IS none WeatherTheme
-
-            // ADD DEBUG LOGS FOR ALL THE ABOVE CASES
-
-            // WAIT FOR THE API CALL TO END TO MAKE THEME TRANSITION
-
+    private IEnumerator WaitForAPICallToEnd()
+    {
+        while (HaTeTP_OpenAI_API._isAPICallProcessing) yield return null;
+        if (!HaTeTP_OpenAI_API._didErrorOccur)
+        {
+            ManageVariables();
             MakeThemeTransition();
         }
     }
 
-    private IEnumerator NoneTheme()
+    private void ManageVariables()
     {
-        yield return new WaitForSeconds(1.17f);
-        _catIcon.rectTransform.rotation = new Quaternion(0, 0, 0, 0);
-        _catIcon.sprite = _catIiconDefaultSource;
-        _catIconAnim.Play("CatGuitar");
-        _background.color = _bacgroundDefaultColor;
-        _rainPS.gameObject.SetActive(false);
-        _cloud.SetActive(false);
-        _cloudB.SetActive(false);
-        _sunRays.SetActive(false);
-        _rainAudio.Stop();
-        _infoText.text = "No information on current weather.";
+        _locationName = _generatedText.GetLocationName();
+        _isLocationValid = _generatedText.CheckIfLocationIsValid();
+        _isLocationReal = _generatedText.CheckIfLocationIsReal();
+        _canAIAccessCurrentWeather = _generatedText.CheckIfAICanAccessCurrentWeather();
+        string _currentThemeAsString = _generatedText.GetCurrentThemeAsString();
+        if (_currentThemeAsString == "none") _currentTheme = WeatherTheme.none;
+        else if (_currentThemeAsString == "other") _currentTheme = WeatherTheme.other;
+        else if (_currentThemeAsString == "rain") _currentTheme = WeatherTheme.rain;
+        else _currentTheme = WeatherTheme.none;
+        AIDebugLogs();
     }
 
-    private IEnumerator OtherTheme()
+    private void AIDebugLogs()
     {
-        yield return new WaitForSeconds(1.17f);
-        _catIcon.rectTransform.rotation = new Quaternion(0, 0, 0, 0);
-        _catIcon.sprite = _catIconSources[0];
-        _catIconAnim.Play("CatCool");
-        _background.color = _backgroundColors[0];
-        _rainPS.gameObject.SetActive(false);
-        _cloud.SetActive(true);
-        _cloudB.SetActive(false);
-        _sunRays.SetActive(true);
-        _rainAudio.Stop();
-        _infoText.text = "Current weather in " + _locationName + " is not rainy.";
-    }
-
-    private IEnumerator RainTheme()
-    {
-        yield return new WaitForSeconds(1.17f);
-        _catIcon.rectTransform.rotation = new Quaternion(0, 0, 0, 0);
-        _catIcon.sprite = _catIconSources[1];
-        _catIconAnim.Play("CatCry");
-        _background.color = _backgroundColors[1];
-        _rainPS.gameObject.SetActive(true);
-        _cloud.SetActive(false);
-        _cloudB.SetActive(true);
-        _sunRays.SetActive(false);
-        _rainAudio.Play();
-        _infoText.text = "Current weather in " + _locationName + " is rainy...";
+        if (_isLocationValid && !_isLocationReal) Debug.Log("AI: The entered location is valid. Its name is " + _locationName + ". This place is fictional. The weather will be guessed.");
+        else if (_isLocationValid && _isLocationReal && _canAIAccessCurrentWeather) Debug.Log("AI: The entered location is valid. Its name is " + _locationName + ". This place is real. Relevant data on current weather can be accessed.");
+        else if (_isLocationValid && _isLocationReal && !_canAIAccessCurrentWeather) Debug.Log("AI: The entered location is valid. Its name is " + _locationName + ". This place is real. Relevant data on current weather can't be accessed.");
+        else Debug.Log("AI: The entered location is invalid. Operations are cancelled.");
+        Debug.Log("Current weather theme is " + _currentTheme + ".");
     }
 
     private void MakeThemeTransition()
@@ -138,5 +102,53 @@ public class ThemeManager : MonoBehaviour
         _themeTransitionCanOccur = false;
         yield return new WaitForSeconds(2.67f);
         _themeTransitionCanOccur = true;
+    }
+
+    private IEnumerator NoneTheme()
+    {
+        yield return new WaitForSeconds(1.17f);
+        _catIcon.rectTransform.rotation = new Quaternion(0, 0, 0, 0);
+        _catIcon.rectTransform.localRotation = new Quaternion(0, 0, 0, 0);
+        _catIcon.sprite = _catIiconDefaultSource;
+        _catIconAnim.Play("CatGuitar");
+        _background.color = _bacgroundDefaultColor;
+        _rainPS.gameObject.SetActive(false);
+        _cloud.SetActive(false);
+        _cloudB.SetActive(false);
+        _sunRays.SetActive(false);
+        _rainAudio.Stop();
+        _infoText.text = "No information on current weather.";
+    }
+
+    private IEnumerator OtherTheme()
+    {
+        yield return new WaitForSeconds(1.17f);
+        _catIcon.rectTransform.rotation = new Quaternion(0, 0, 0, 0);
+        _catIcon.rectTransform.localRotation = new Quaternion(0, 0, 0, 0);
+        _catIcon.sprite = _catIconSources[0];
+        _catIconAnim.Play("CatCool");
+        _background.color = _backgroundColors[0];
+        _rainPS.gameObject.SetActive(false);
+        _cloud.SetActive(true);
+        _cloudB.SetActive(false);
+        _sunRays.SetActive(true);
+        _rainAudio.Stop();
+        _infoText.text = "Current weather in " + _locationName + " is not rainy.";
+    }
+
+    private IEnumerator RainTheme()
+    {
+        yield return new WaitForSeconds(1.17f);
+        _catIcon.rectTransform.rotation = new Quaternion(0, 0, 0, 0);
+        _catIcon.rectTransform.localRotation = new Quaternion(0, 0, 0, 0);
+        _catIcon.sprite = _catIconSources[1];
+        _catIconAnim.Play("CatCry");
+        _background.color = _backgroundColors[1];
+        _rainPS.gameObject.SetActive(true);
+        _cloud.SetActive(false);
+        _cloudB.SetActive(true);
+        _sunRays.SetActive(false);
+        _rainAudio.Play();
+        _infoText.text = "Current weather in " + _locationName + " is rainy...";
     }
 }
