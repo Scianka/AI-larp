@@ -18,6 +18,8 @@ public class ThemeManager : MonoBehaviour
     public GameObject _cloudB;
     public GameObject _sunRays;
     public AudioSource _rainAudio;
+    public AudioSource _backgroundAudio;
+    public Image _soundButtonImage;
     public Animator _transitionBlockAnim;
     private bool _themeTransitionCanOccur = true;
     public TMP_InputField _playerText;
@@ -150,5 +152,19 @@ public class ThemeManager : MonoBehaviour
         _sunRays.SetActive(false);
         _rainAudio.Play();
         _infoText.text = "Current weather in " + _locationName + " is rainy...";
+    }
+
+    public void ToggleBackgroundSound()
+    {
+        if (_backgroundAudio.volume == 0)
+        {
+            _backgroundAudio.volume = 0.7f;
+            _soundButtonImage.color = new Color32(255, 255, 255, 245);
+        }
+        else
+        {
+            _backgroundAudio.volume = 0;
+            _soundButtonImage.color = new Color32(255, 255, 255, 150);
+        }
     }
 }

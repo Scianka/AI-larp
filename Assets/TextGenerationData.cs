@@ -13,9 +13,13 @@ public class TextGenerationData
 
     private string CatWeatherDataParser(int _variableNumber)
     {
-        string _generatedText = choices[0].message.content; // Bytom*valid*real*true*other
-        string[] _variablesAsStrings = _generatedText.Split('*');
-        return _variablesAsStrings[_variableNumber];
+        if (choices[0].finish_reason != "")
+        {
+            string _generatedText = choices[0].message.content; // Bytom*valid*real*true*other
+            string[] _variablesAsStrings = _generatedText.Split('*');
+            return _variablesAsStrings[_variableNumber];
+        }
+        else return "";
     }
 
     public string GetLocationName() => CatWeatherDataParser(0);
