@@ -15,8 +15,7 @@ public class PageSwitch : MonoBehaviour
     public Image LB_img;
     public Image RB_img;
 
-    [HideInInspector]
-    public bool can_switch = true;
+    public bool can_switch { get; set; }
 
     private void Start()
     {
@@ -26,11 +25,10 @@ public class PageSwitch : MonoBehaviour
 
     private void Update()
     {
-        Debug.Log(can_switch);
         if (can_switch)
         {
-            if (Input.GetKeyDown(KeyCode.Keypad3) || Input.GetKeyDown(KeyCode.PageDown)) NextPage();
-            if (Input.GetKeyDown(KeyCode.Keypad9) || Input.GetKeyDown(KeyCode.PageUp)) PreviousPage();
+            if (Input.GetKeyDown(KeyCode.RightArrow)) NextPage();
+            if (Input.GetKeyDown(KeyCode.LeftArrow)) PreviousPage();
         }
         WhatPage();
     }

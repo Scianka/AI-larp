@@ -4,36 +4,46 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
+using System.Drawing;
 
 public class PanelSwitch : MonoBehaviour
 {
     public PageSwitch PageSwitch_script;
+    public Image light_bulb;
     private TMP_InputField promptIF;
-    public bool is_promptIF_active = false;
+    private bool prompt_activated = false;
 
     private void Start()
     {
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
         promptIF = GetComponent<TMP_InputField>();
-        promptIF.DeactivateInputField();
+        promptIF.enabled = false;
+
+        light_bulb.enabled = false;
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Delete)) // need to choose other key
+
+        if (Input.GetKeyDown(KeyCode.F1))
         {
-            // need to add a behaviour in case of clicking the IF instead of pressing a key
-            // can_switch at PageSwitch works weridly at start
-            // a better input block is required for IF - or I can just leave it
-            is_promptIF_active = !is_promptIF_active;
-            if (is_promptIF_active)
+            if (!prompt_activated)
             {
+                promptIF.enabled = true;
                 promptIF.ActivateInputField();
                 PageSwitch_script.can_switch = false;
+                light_bulb.enabled = true;
+                prompt_activated = true;
+
             }
-            else
+            else if (prompt_activated)
             {
-                promptIF.DeactivateInputField();
+                promptIF.enabled = false;
                 PageSwitch_script.can_switch = true;
+                light_bulb.enabled = false;
+                prompt_activated = false;
             }
         }
     }
