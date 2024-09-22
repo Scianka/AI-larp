@@ -48,7 +48,11 @@ public class PageSwitch : MonoBehaviour
 
     public void NewText() => content_text.pageToDisplay = 1;
 
-    private void WhatPage() => what_page.text = content_text.pageToDisplay.ToString() + " / " + content_text.textInfo.pageCount.ToString();
+    private void WhatPage()
+    {
+        if (content_text.textInfo.pageCount < 2) what_page.text = "";
+        else what_page.text = content_text.pageToDisplay.ToString() + " / " + content_text.textInfo.pageCount.ToString();
+    }
 
     private IEnumerator LBLight()
     {

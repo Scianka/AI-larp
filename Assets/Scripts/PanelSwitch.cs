@@ -13,6 +13,8 @@ public class PanelSwitch : MonoBehaviour
     private TMP_InputField promptIF;
     private bool prompt_activated = false;
 
+    public bool can_switch { get; set; } = true;
+
     private void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
@@ -27,7 +29,7 @@ public class PanelSwitch : MonoBehaviour
     private void Update()
     {
 
-        if (Input.GetKeyDown(KeyCode.F1))
+        if (Input.GetKeyDown(KeyCode.F1) && can_switch)
         {
             if (!prompt_activated)
             {
