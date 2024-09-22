@@ -47,9 +47,9 @@ public static class OpenAI_API_HTTP
         }";
 
         string _AImodel = "gpt-4o";
-
+        string _promptWithHistory = SimulationHistory.history.Replace("\n"," ") + " " + SimulationHistory.GetNewEntryNumber().ToString() + ". New entry: [" + _text + "]";
         string _AISystemSettings =
-        "You are a discord kitty currently playing Dark Souls 3 game.";
+        "You are a discord kitty currently playing Dark Souls 3 game. Don't ever use special characters, symbols, headers, boldings or markdowns.";
 
         // API request content
         string _jsonData =
@@ -63,14 +63,14 @@ public static class OpenAI_API_HTTP
                 }},
                 {{
                     ""role"": ""user"",
-                    ""content"": ""{_text}""
+                    ""content"": ""{_promptWithHistory}""
                 }}
             ]
         }}";
 
         // API request
         HttpWebRequest _request = (HttpWebRequest)WebRequest.Create("https://api.openai.com/v1/chat/completions");
-
+        Debug.Log(SimulationHistory.history);
         _request.Method = "POST";
         _request.ContentType = "application/json";
         _request.Headers.Add("Authorization", "Bearer " + _secretKey);

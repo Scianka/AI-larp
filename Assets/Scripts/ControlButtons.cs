@@ -13,6 +13,7 @@ public class ControlButtons : MonoBehaviour
     public TMP_InputField promptIF;
     [HideInInspector]
     public string contentAI;
+    private string prompt_holder;
     private TextGenerationData _generatedText;
     private Coroutine SendPromptCoroutine;
     private bool buttons_blocked = false;
@@ -74,8 +75,9 @@ public class ControlButtons : MonoBehaviour
 
     private IEnumerator SendPrompt()
     {
-        string _cleanPrompt = promptIF.text.Replace("\t", "").Replace("\n", "").Replace("\r", "");
+        string _cleanPrompt = promptIF.text.Replace("\t","").Replace("\r","").Replace("\n","").Replace("\"","'");
         if (is_spell) _cleanPrompt = "This is just a test prompt. Say: 'DLC Spell' and don't change it in any way.";
+        prompt_holder = _cleanPrompt;
         text_fade_mode = "out";
         FadeTextCheck();
         yield return new WaitForSeconds(0.5f);
@@ -91,9 +93,12 @@ public class ControlButtons : MonoBehaviour
         {
             contentAI = _generatedText.GetContent();
             content_text.text = contentAI;
-            PageSwitch_script.NewText();
         }
         else content_text.text = "...";
+        yield return new WaitForSeconds(0f);
+        SimulationHistory.AddPromptToHistory(prompt_holder);
+        SimulationHistory.AddResponseToHistory(content_text.text);
+        PageSwitch_script.NewText();
         text_fade_mode = "in";
         FadeTextCheck();
     }
