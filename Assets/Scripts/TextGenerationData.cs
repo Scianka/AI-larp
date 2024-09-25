@@ -20,7 +20,7 @@ public class TextGenerationData
             content = choices[0].message.content;
             return content;
         }
-        else return "";
+        else return "...";
     }
 }
 

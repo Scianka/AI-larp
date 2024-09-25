@@ -9,6 +9,7 @@ using System.Drawing;
 public class PanelSwitch : MonoBehaviour
 {
     public PageSwitch PageSwitch_script;
+    public GameObject device_lights;
     public Image light_bulb;
     private TMP_InputField promptIF;
     private bool prompt_activated = false;
@@ -23,6 +24,7 @@ public class PanelSwitch : MonoBehaviour
         promptIF = GetComponent<TMP_InputField>();
         promptIF.enabled = false;
 
+        device_lights.SetActive(false);
         light_bulb.enabled = false;
     }
 
@@ -37,6 +39,7 @@ public class PanelSwitch : MonoBehaviour
                 promptIF.ActivateInputField();
                 PageSwitch_script.can_switch = false;
                 light_bulb.enabled = true;
+                device_lights.SetActive(false);
                 prompt_activated = true;
 
             }
@@ -45,6 +48,7 @@ public class PanelSwitch : MonoBehaviour
                 promptIF.enabled = false;
                 PageSwitch_script.can_switch = true;
                 light_bulb.enabled = false;
+                device_lights.SetActive(true);
                 prompt_activated = false;
             }
         }

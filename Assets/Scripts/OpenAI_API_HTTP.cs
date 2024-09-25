@@ -6,12 +6,12 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using UnityEngine;
 
-// working with HTTP requests
+// this script can handle only one API call at a time
 public static class OpenAI_API_HTTP
 {
     public static bool _isAPICallProcessing = false;
-    public static bool _didErrorOccur = false; // is set to true when a response is defective or error happened
-    private static string _secretKey;
+    public static bool _didErrorOccur = false; // is set to true when a response is defective or an error happened
+    private static string _secretKey; // this needs to be set manually for the tests' sake
 
     public static void GetAPIKey() => _secretKey = Environment.GetEnvironmentVariable("OPENAI_API_KEY", EnvironmentVariableTarget.User);
 
@@ -47,9 +47,15 @@ public static class OpenAI_API_HTTP
         }";
 
         string _AImodel = "gpt-4o";
-        string _promptWithHistory = SimulationHistory.history.Replace("\n"," ") + " " + SimulationHistory.GetNewEntryNumber().ToString() + ". New entry: [" + _text + "]";
-        string _AISystemSettings =
-        "You are a discord kitty currently playing Dark Souls 3 game. Don't ever use special characters, symbols, headers, boldings or markdowns.";
+        string _AISystemSettings = "You are a discord kitty currently playing Dark Souls 3 game. Don't ever use special characters, symbols, headers, boldings or markdowns.";
+        //string _promptWithHistory = SimulationHistory.history.Replace("\n"," ") + " " + SimulationHistory.GetNewEntryNumber().ToString() + ". New entry: [" + _text + "]";
+        /*string full_prompt =
+        "New user prompt: [" + new_prompt + "] " +
+        "Time calculations: [" + time_info + "] " +
+        "Last dungeon's update: [" + last_update + "] " +
+        "Last system response: [" + last_response + "] " +
+        "Last user prompt: [" + last_prompt + "] " +
+        "Summary: [" + summary + "]";*/
 
         // API request content
         string _jsonData =
@@ -63,14 +69,13 @@ public static class OpenAI_API_HTTP
                 }},
                 {{
                     ""role"": ""user"",
-                    ""content"": ""{_promptWithHistory}""
+                    ""content"": ""{_text}""
                 }}
             ]
         }}";
 
         // API request
         HttpWebRequest _request = (HttpWebRequest)WebRequest.Create("https://api.openai.com/v1/chat/completions");
-        Debug.Log(SimulationHistory.history);
         _request.Method = "POST";
         _request.ContentType = "application/json";
         _request.Headers.Add("Authorization", "Bearer " + _secretKey);

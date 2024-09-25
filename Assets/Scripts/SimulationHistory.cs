@@ -34,7 +34,7 @@ public static class SimulationHistory
     public static int GetNewEntryNumber()
     {
         new_entry_number = ++entries_counter;
-        entries_counter--; Debug.Log(new_entry_number);
+        entries_counter--;
         return new_entry_number;
     }
 }

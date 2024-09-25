@@ -9,26 +9,25 @@ public class ControlButtons : MonoBehaviour
     [Header("Prompt")]
     public PanelSwitch PanelSwitch_script;
     public PageSwitch PageSwitch_script;
-    public TMP_Text content_text;
     public TMP_InputField promptIF;
-    [HideInInspector]
-    public string contentAI;
+    public TMP_Text contentTF;
+
+    public string contentAI { set; get; }
+
     private string prompt_holder;
     private TextGenerationData _generatedText;
     private Coroutine SendPromptCoroutine;
     private bool buttons_blocked = false;
     private bool is_spell;
 
-
     [Header("Looks")]
+    public float text_transition_time;
     public Image wish_button;
     public Sprite WB_default;
     public Sprite WB_light;
     public Image spell_button;
     public Sprite SB_default;
     public Sprite SB_light;
-    public Image black_screen;
-    public Image demon_eyes;
     private Coroutine FadeImageCoroutine;
     private Coroutine FadeTextCoroutine;
     private Color32 zero_visibility = new Color32(0, 0, 0, 0);
@@ -38,12 +37,10 @@ public class ControlButtons : MonoBehaviour
     private string img_fade_mode;
     private Image img_to_fade;
 
-
     private void Start()
     {
         OpenAI_API_HTTP.GetAPIKey();
-        text_full_visibility = content_text.color;
-        black_screen.color = zero_visibility;
+        text_full_visibility = contentTF.color;
     }
 
     private void Update()
@@ -80,8 +77,7 @@ public class ControlButtons : MonoBehaviour
         prompt_holder = _cleanPrompt;
         text_fade_mode = "out";
         FadeTextCheck();
-        yield return new WaitForSeconds(0.5f);
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(text_transition_time + 0.1f);
         _generatedText = OpenAI_API_HTTP.GenerateText(_cleanPrompt);
         StartCoroutine(WaitForAPICallToEnd());
     }
@@ -89,15 +85,15 @@ public class ControlButtons : MonoBehaviour
     private IEnumerator WaitForAPICallToEnd()
     {
         while (OpenAI_API_HTTP._isAPICallProcessing) yield return null;
+
         if (!OpenAI_API_HTTP._didErrorOccur)
         {
             contentAI = _generatedText.GetContent();
-            content_text.text = contentAI;
+            contentTF.text = contentAI;
         }
-        else content_text.text = "...";
-        yield return new WaitForSeconds(0f);
+        else contentTF.text = "...";
         SimulationHistory.AddPromptToHistory(prompt_holder);
-        SimulationHistory.AddResponseToHistory(content_text.text);
+        SimulationHistory.AddResponseToHistory(contentTF.text);
         PageSwitch_script.NewText();
         text_fade_mode = "in";
         FadeTextCheck();
@@ -129,31 +125,32 @@ public class ControlButtons : MonoBehaviour
 
         if (text_fade_mode == "out")
         {
-            content_text.color = text_full_visibility;
-            yield return new WaitForSeconds(0.5f);
+            contentTF.color = text_full_visibility;
+            yield return new WaitForSeconds(text_transition_time);
             while (elapsed_time < 1f)
             {
                 elapsed_time += Time.deltaTime;
-                content_text.color = Color.Lerp(text_full_visibility, zero_visibility, elapsed_time / 1f);
+                contentTF.color = Color.Lerp(text_full_visibility, zero_visibility, elapsed_time / 1f);
                 yield return null;
             }
-            content_text.color = zero_visibility;
+            contentTF.color = zero_visibility;
         }
+
         else if (text_fade_mode == "in")
         {
-            content_text.color = zero_visibility;
-            yield return new WaitForSeconds(0.5f);
+            contentTF.color = zero_visibility;
+            yield return new WaitForSeconds(text_transition_time);
             while (elapsed_time < 1f)
             {
                 elapsed_time += Time.deltaTime;
-                content_text.color = Color.Lerp(zero_visibility, text_full_visibility, elapsed_time / 1f);
+                contentTF.color = Color.Lerp(zero_visibility, text_full_visibility, elapsed_time / 1f);
                 yield return null;
             }
-            content_text.color = text_full_visibility;
+            contentTF.color = text_full_visibility;
         }
     }
 
-    public void FadeImageCheck()
+    /*public void FadeImageCheck()
     {
         if (FadeImageCoroutine != null) StopCoroutine(FadeImageCoroutine);
         FadeImageCoroutine = StartCoroutine("FadeImage");
@@ -187,14 +184,14 @@ public class ControlButtons : MonoBehaviour
             }
             img_to_fade.color = full_visibility;
         }
-    }
+    }*/
 
     private IEnumerator ButtonsBlocked()
     {
         buttons_blocked = true;
-        PanelSwitch_script.can_switch = false;
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(text_transition_time + 0.1f);
+        while (OpenAI_API_HTTP._isAPICallProcessing) yield return null;
+        yield return new WaitForSeconds(text_transition_time);
         buttons_blocked = false;
-        PanelSwitch_script.can_switch = true;
     }
 }
