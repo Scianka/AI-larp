@@ -2673,6 +2673,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1239422406}
+  - component: {fileID: 1239422408}
   - component: {fileID: 1239422407}
   m_Layer: 0
   m_Name: ScriptHolder
@@ -2710,16 +2711,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PanelSwitch_script: {fileID: 2064471132}
   PageSwitch_script: {fileID: 897468670}
-  content_text: {fileID: 897468668}
   promptIF: {fileID: 2064471129}
-  contentAI: 
-  text_transition_time: 0
+  contentTF: {fileID: 897468668}
+  text_transition_time: 0.5
   wish_button: {fileID: 1127110171}
   WB_default: {fileID: -15121066305905564, guid: 604f92c9fa27a544ab3997807313c644, type: 3}
   WB_light: {fileID: -1597786864959473167, guid: 604f92c9fa27a544ab3997807313c644, type: 3}
   spell_button: {fileID: 651460380}
   SB_default: {fileID: -1860891720754277442, guid: 78d1f73ae35a549409595d6b7e60fe56, type: 3}
   SB_light: {fileID: 776235566075771346, guid: 78d1f73ae35a549409595d6b7e60fe56, type: 3}
+--- !u!114 &1239422408
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1239422405}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d2878a4cdfbb7ee4fb20bb4273cee714, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _howManyPlayersAttendingSession: 1
 --- !u!1 &1320235051
 GameObject:
   m_ObjectHideFlags: 0
