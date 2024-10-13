@@ -11,6 +11,11 @@ public class SimulationData : MonoBehaviour
         OpenAI_API_HTTP.players_info = GetPlayersInfo();
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
+    }
+
     private string GetPlayersInfo()
     {
         if (_howManyPlayersAttendingSession == 1) return "You will be interacting with only one player during this session.";
